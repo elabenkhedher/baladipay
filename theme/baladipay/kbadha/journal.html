@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal & Statistiques — Kbadha</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --kbadha-navy: #1a2e4a;
+            --kbadha-light: #1e3d6b;
+            --kbadha-gold: #f6c23e;
+        }
+
+        /* ══ Stat cards ══ */
+        .stat-kbadha {
+            border: none;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,.09);
+            transition: transform .18s;
+        }
+        .stat-kbadha:hover { transform: translateY(-3px); }
+        .stat-kbadha .stat-header {
+            padding: 1.25rem 1.5rem .9rem;
+            color: #fff;
+        }
+        .stat-kbadha .stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.18);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: .7rem;
+        }
+        .stat-kbadha .stat-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .stat-kbadha .stat-label {
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: .78;
+            margin-top: .2rem;
+        }
+        .stat-kbadha .stat-footer {
+            background: rgba(0,0,0,.06);
+            padding: .6rem 1.5rem;
+            font-size: .72rem;
+            color: rgba(255,255,255,.85);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        /* ══ Donut / repartition ══ */
+        .repartition-bar {
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #e3e6f0;
+        }
+        .repartition-bar .bar-especes {
+            height: 100%;
+            background: linear-gradient(90deg, #1cc88a, #17a673);
+            border-radius: 6px 0 0 6px;
+            transition: width .5s ease;
+        }
+
+        /* ══ Journal table ══ */
+        .journal-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            overflow: hidden;
+        }
+        .journal-card .card-header {
+            background: linear-gradient(135deg, var(--kbadha-navy), var(--kbadha-light));
+            border: none;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge-especes { background: #d4edda; color: #155724; }
+        .badge-cheque  { background: #d1ecf1; color: #0c5460; }
+
+        /* Table row hover */
+        #tableJournal tbody tr:hover { background: #f8f9fc; }
+
+        /* ══ Timeline per hour ══ */
+        .hour-bar-wrap {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 80px;
+            gap: 4px;
+            padding: 0 .25rem;
+        }
+        .hour-bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .hour-bar {
+            width: 100%;
+            border-radius: 4px 4px 0 0;
+            background: linear-gradient(180deg, #1e3d6b, #1a2e4a);
+            min-height: 4px;
+            transition: height .4s ease;
+        }
+        .hour-bar-label { font-size: .58rem; color: #a0aec0; margin-top: 3px; }
+        .hour-bar-count { font-size: .62rem; font-weight: 700; color: #1a2e4a; }
+
+        /* ══ Reçu badge ══ */
+        .badge-recu {
+            background: #e8f4fd;
+            color: #1a6fa8;
+            font-size: .68rem;
+            padding: 3px 7px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .badge-recu:hover { background: #1a2e4a; color: #fff; text-decoration: none; }
+
+        /* ══ Filters ══ */
+        .filter-bar {
+            background: #fff;
+            border-radius: 10px;
+            padding: .85rem 1.25rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* ══ Export button ══ */
+        .btn-export {
+            background: linear-gradient(135deg, var(--kbadha-navy), var(--kbadha-light));
+            color: #fff; border: none;
+            border-radius: 8px; padding: .45rem 1rem;
+            font-size: .82rem; font-weight: 700;
+            transition: opacity .2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-export:hover { opacity: .88; color: #fff; }
+
+        /* Sidebar */
+        .sidebar { min-height: 100vh; }
+        #wrapper { display: flex; }
+        #content-wrapper { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+        #content { flex: 1; }
+    </style>
+</head>
+<body id="page-top">
+
+<div id="wrapper">
+
+    <!-- templates/kbadha/_sidebar.html -->
+<ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebarKbadha"
+    style="background: linear-gradient(180deg, #1a2e4a 10%, #1e3d6b 100%); background-color: #1a2e4a;">
+
+    <!-- Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="encaissement.html">
+        <div class="sidebar-brand-icon">
+            <i class="fas fa-cash-register fa-lg"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3" style="line-height:1.2;">
+            Kbadha
+            <span style="display:block;font-size:.62rem;font-weight:400;opacity:.65;letter-spacing:1.5px;text-transform:uppercase;">
+                Guichet BaladiPay
+            </span>
+        </div>
+    </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <!-- Encaissement -->
+    <li class="nav-item">
+        <a class="nav-link" href="encaissement.html">
+            <i class="fas fa-fw fa-hand-holding-usd"></i>
+            <span>Encaissement</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Session</div>
+
+    <!-- Journal -->
+    <li class="nav-item active">
+        <a class="nav-link" href="journal.html">
+            <i class="fas fa-fw fa-book-open"></i>
+            <span>Journal du jour</span>
+            <span class="badge badge-success ml-auto">5</span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Actions</div>
+
+    <!-- Nouveau citoyen minimal -->
+    <li class="nav-item">
+        <a class="nav-link" href="citoyen_new.html" data-toggle="modal" data-target="#modalCitoyenMinimal">
+            <i class="fas fa-fw fa-user-plus"></i>
+            <span>Citoyen sans compte</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+</ul>
+
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 bg-transparent p-0">
+                        <li class="breadcrumb-item">
+                            <a href="encaissement.html" class="text-primary">Encaissement</a>
+                        </li>
+                        <li class="breadcrumb-item active">Journal &amp; Statistiques</li>
+                    </ol>
+                </nav>
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item mr-2">
+                        <a href="encaissement.html" class="btn btn-sm font-weight-bold"
+                           style="background:var(--kbadha-navy);color:#fff;border-radius:8px;">
+                            <i class="fas fa-hand-holding-usd mr-1"></i>Encaisser
+                        </a>
+                    </li>
+                    <div class="topbar-divider d-none d-sm-block"></div>
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Mohamed Ben Salah</span>
+                            <div style="width:36px;height:36px;background:linear-gradient(135deg,#1a2e4a,#1e3d6b);display:inline-flex;align-items:center;justify-content:center;border-radius:50%;">
+                                <i class="fas fa-user text-white" style="font-size:.85rem;"></i>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <a class="dropdown-item text-danger" href="#">
+                                <i class="fas fa-sign-out-alt fa-sm mr-2 text-danger"></i>Déconnexion
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main content -->
+            <div class="container-fluid">
+
+                <!-- Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">
+                            <i class="fas fa-chart-bar mr-2 text-primary"></i>Journal &amp; Statistiques
+                        </h1>
+                        <p class="text-muted mb-0 small">
+                            <i class="fas fa-calendar-day mr-1"></i>
+                            Session du 27/03/2026 — Agent : Mohamed Ben Salah
+                        </p>
+                    </div>
+                    <div class="d-flex" style="gap:.5rem;">
+                        <a href="#" class="btn-export">
+                            <i class="fas fa-file-pdf mr-1"></i>Export PDF
+                        </a>
+                        <a href="#" class="btn-export" style="background:linear-gradient(135deg,#1cc88a,#17a673);">
+                            <i class="fas fa-file-csv mr-1"></i>Export CSV
+                        </a>
+                    </div>
+                </div>
+
+                <!-- STATS CARDS -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stat-kbadha">
+                            <div class="stat-header" style="background:linear-gradient(135deg,#1a2e4a,#1e3d6b);">
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">Citoyens servis</div>
+                            </div>
+                            <div class="stat-footer" style="background:rgba(26,46,74,.85);">
+                                <span><i class="fas fa-arrow-up mr-1"></i>Session en cours</span>
+                                <span>5 op.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stat-kbadha">
+                            <div class="stat-header" style="background:linear-gradient(135deg,#1cc88a,#17a673);">
+                                <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                                <div class="stat-value">1 245.500 <small style="font-size:.85rem;">DT</small></div>
+                                <div class="stat-label">Total encaissé</div>
+                            </div>
+                            <div class="stat-footer" style="background:rgba(23,166,115,.85);">
+                                <span><i class="fas fa-money-bill-wave mr-1"></i>Taxes + amendes</span>
+                                <span>Aujourd'hui</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stat-kbadha">
+                            <div class="stat-header" style="background:linear-gradient(135deg,#36b9cc,#258391);">
+                                <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                <div class="stat-value">870.000 <small style="font-size:.85rem;">DT</small></div>
+                                <div class="stat-label">Encaissé en espèces</div>
+                            </div>
+                            <div class="stat-footer" style="background:rgba(37,131,145,.85);">
+                                <span>3 opérations</span>
+                                <span>70%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="stat-kbadha">
+                            <div class="stat-header" style="background:linear-gradient(135deg,#6610f2,#4c0cb4);">
+                                <div class="stat-icon"><i class="fas fa-money-check"></i></div>
+                                <div class="stat-value">375.500 <small style="font-size:.85rem;">DT</small></div>
+                                <div class="stat-label">Encaissé par chèque</div>
+                            </div>
+                            <div class="stat-footer" style="background:rgba(76,12,180,.85);">
+                                <span>2 opérations</span>
+                                <span>30%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 2 : Répartition + Activité horaire -->
+                <div class="row mb-4">
+
+                    <!-- Répartition -->
+                    <div class="col-xl-5 mb-4">
+                        <div class="card border-0 shadow h-100" style="border-radius:14px;">
+                            <div class="card-header py-3 d-flex align-items-center justify-content-between bg-white border-bottom">
+                                <h6 class="mb-0 font-weight-bold" style="color:#1a2e4a;">
+                                    <i class="fas fa-chart-pie mr-2 text-primary"></i>Répartition Espèces / Chèques
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <canvas id="donutChart" width="200" height="200"
+                                            data-especes="70" data-cheques="30"></canvas>
+                                </div>
+                                <div class="d-flex justify-content-around mb-3">
+                                    <div class="text-center">
+                                        <div style="font-size:1.4rem;font-weight:800;color:#1cc88a;">70%</div>
+                                        <div style="font-size:.72rem;color:#718096;text-transform:uppercase;">
+                                            <i class="fas fa-money-bill-wave mr-1"></i>Espèces
+                                        </div>
+                                    </div>
+                                    <div style="width:1px;background:#e3e6f0;"></div>
+                                    <div class="text-center">
+                                        <div style="font-size:1.4rem;font-weight:800;color:#6610f2;">30%</div>
+                                        <div style="font-size:.72rem;color:#718096;text-transform:uppercase;">
+                                            <i class="fas fa-money-check mr-1"></i>Chèques
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="repartition-bar mb-2">
+                                    <div class="bar-especes" style="width:70%;"></div>
+                                </div>
+                                <div class="d-flex justify-content-between" style="font-size:.72rem;color:#a0aec0;">
+                                    <span>Espèces : 870.000 DT</span>
+                                    <span>Chèques : 375.500 DT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activité par heure -->
+                    <div class="col-xl-7 mb-4">
+                        <div class="card border-0 shadow h-100" style="border-radius:14px;">
+                            <div class="card-header py-3 bg-white border-bottom">
+                                <h6 class="mb-0 font-weight-bold" style="color:#1a2e4a;">
+                                    <i class="fas fa-clock mr-2 text-primary"></i>Activité par heure — session du jour
+                                </h6>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-end" style="padding-bottom:.75rem;">
+                                <div class="hour-bar-wrap" id="hourBars"></div>
+                                <div class="text-center mt-2" style="font-size:.72rem;color:#a0aec0;">
+                                    <i class="fas fa-info-circle mr-1"></i>Nombre d'opérations par heure
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- JOURNAL TABLE -->
+                <div class="journal-card">
+                    <div class="card-header">
+                        <h6 class="mb-0 font-weight-bold text-white">
+                            <i class="fas fa-book-open mr-2"></i>Journal de la session
+                            <span class="badge badge-light text-dark ml-2">5 opérations</span>
+                        </h6>
+                        <div class="d-flex align-items-center" style="gap:.5rem;">
+                            <select class="form-control form-control-sm" style="width:130px;border-radius:6px;" onchange="applyFilter()">
+                                <option value="">Tous les modes</option>
+                                <option value="especes">Espèces</option>
+                                <option value="cheque">Chèque</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-bar" style="border-radius:0;margin-bottom:0;box-shadow:none;border-bottom:1px solid #e3e6f0;">
+                        <div class="d-flex align-items-center" style="gap:.75rem;flex-wrap:wrap;">
+                            <span style="font-size:.72rem;font-weight:700;color:#718096;text-transform:uppercase;">
+                                <i class="fas fa-filter mr-1"></i>Filtrer :
+                            </span>
+                            <input type="text" class="form-control form-control-sm" style="width:200px;"
+                                   placeholder="Nom ou CIN…" id="filterSearch" oninput="applyFilter()">
+                            <select class="form-control form-control-sm" style="width:130px;" id="filterMode" onchange="applyFilter()">
+                                <option value="">Tous modes</option>
+                                <option value="especes">Espèces</option>
+                                <option value="cheque">Chèque</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="resetFilters()">
+                                <i class="fas fa-times mr-1"></i>Reset
+                            </button>
+                        </div>
+                        <div class="ml-auto" style="font-size:.75rem;color:#1a2e4a;font-weight:700;">
+                            Total filtré : <span id="filteredTotal">1 245.500 DT</span>
+                        </div>
+                    </div>
+
+                    <div style="padding:1.25rem;">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="tableJournal">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th style="width:50px;">#</th>
+                                        <th>Heure</th>
+                                        <th>Citoyen</th>
+                                        <th>CIN</th>
+                                        <th>Éléments payés</th>
+                                        <th>Mode</th>
+                                        <th class="text-right">Montant</th>
+                                        <th class="text-center">Reçu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="journalBody">
+                                    <tr data-mode="especes" data-search="ali ben mrad 12345678">
+                                        <td class="text-muted small">1</td>
+                                        <td><span class="font-weight-bold" style="font-size:.82rem;">08:14</span></td>
+                                        <td>
+                                            <div class="font-weight-bold" style="font-size:.88rem;">Ali Ben Mrad</div>
+                                            <small class="text-muted" style="font-size:.7rem;">Tunis, Bab El Bhar</small>
+                                        </td>
+                                        <td><code style="font-size:.8rem;color:#1a2e4a;">12345678</code></td>
+                                        <td>
+                                            <div style="font-size:.78rem;">
+                                                <span class="badge" style="background:#e8f4fd;color:#1a6fa8;margin-bottom:2px;">
+                                                    <i class="fas fa-file-invoice mr-1"></i>Taxe foncière 2025
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-especes px-2 py-1">
+                                                <i class="fas fa-money-bill-wave mr-1"></i>Espèces
+                                            </span>
+                                        </td>
+                                        <td class="text-right"><strong style="color:#1a2e4a;font-size:.95rem;">320.000 DT</strong></td>
+                                        <td class="text-center"><a href="#" class="badge-recu"><i class="fas fa-file-pdf mr-1"></i>PDF</a></td>
+                                    </tr>
+                                    <tr data-mode="cheque" data-search="fatma chaari 87654321">
+                                        <td class="text-muted small">2</td>
+                                        <td><span class="font-weight-bold" style="font-size:.82rem;">09:02</span></td>
+                                        <td>
+                                            <div class="font-weight-bold" style="font-size:.88rem;">Fatma Chaari</div>
+                                            <small class="text-muted" style="font-size:.7rem;">Ariana, Ghazala</small>
+                                        </td>
+                                        <td><code style="font-size:.8rem;color:#1a2e4a;">87654321</code></td>
+                                        <td>
+                                            <div style="font-size:.78rem;">
+                                                <span class="badge" style="background:#fdf0f0;color:#c0392b;margin-bottom:2px;">
+                                                    <i class="fas fa-gavel mr-1"></i>Amende
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-cheque px-2 py-1">
+                                                <i class="fas fa-money-check mr-1"></i>Chèque
+                                            </span>
+                                        </td>
+                                        <td class="text-right"><strong style="color:#1a2e4a;font-size:.95rem;">150.500 DT</strong></td>
+                                        <td class="text-center"><a href="#" class="badge-recu"><i class="fas fa-file-pdf mr-1"></i>PDF</a></td>
+                                    </tr>
+                                    <tr data-mode="especes" data-search="karim mansour 11223344">
+                                        <td class="text-muted small">3</td>
+                                        <td><span class="font-weight-bold" style="font-size:.82rem;">10:35</span></td>
+                                        <td>
+                                            <div class="font-weight-bold" style="font-size:.88rem;">Karim Mansour</div>
+                                            <small class="text-muted" style="font-size:.7rem;">La Marsa, Sidi Bou Saïd</small>
+                                        </td>
+                                        <td><code style="font-size:.8rem;color:#1a2e4a;">11223344</code></td>
+                                        <td>
+                                            <div style="font-size:.78rem;">
+                                                <span class="badge" style="background:#e8f4fd;color:#1a6fa8;margin-bottom:2px;">
+                                                    <i class="fas fa-file-invoice mr-1"></i>Taxe d'habitation 2024
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-especes px-2 py-1">
+                                                <i class="fas fa-money-bill-wave mr-1"></i>Espèces
+                                            </span>
+                                        </td>
+                                        <td class="text-right"><strong style="color:#1a2e4a;font-size:.95rem;">280.000 DT</strong></td>
+                                        <td class="text-center"><a href="#" class="badge-recu"><i class="fas fa-file-pdf mr-1"></i>PDF</a></td>
+                                    </tr>
+                                    <tr data-mode="cheque" data-search="leila trabelsi 55667788">
+                                        <td class="text-muted small">4</td>
+                                        <td><span class="font-weight-bold" style="font-size:.82rem;">11:20</span></td>
+                                        <td>
+                                            <div class="font-weight-bold" style="font-size:.88rem;">Leila Trabelsi</div>
+                                            <small class="text-muted" style="font-size:.7rem;">Ben Arous, Hammam Lif</small>
+                                        </td>
+                                        <td><code style="font-size:.8rem;color:#1a2e4a;">55667788</code></td>
+                                        <td>
+                                            <div style="font-size:.78rem;">
+                                                <span class="badge" style="background:#e8f4fd;color:#1a6fa8;margin-bottom:2px;">
+                                                    <i class="fas fa-file-invoice mr-1"></i>Taxe foncière 2025
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-cheque px-2 py-1">
+                                                <i class="fas fa-money-check mr-1"></i>Chèque
+                                            </span>
+                                        </td>
+                                        <td class="text-right"><strong style="color:#1a2e4a;font-size:.95rem;">225.000 DT</strong></td>
+                                        <td class="text-center"><a href="#" class="badge-recu"><i class="fas fa-file-pdf mr-1"></i>PDF</a></td>
+                                    </tr>
+                                    <tr data-mode="especes" data-search="hedi gharbi 99887766">
+                                        <td class="text-muted small">5</td>
+                                        <td><span class="font-weight-bold" style="font-size:.82rem;">13:47</span></td>
+                                        <td>
+                                            <div class="font-weight-bold" style="font-size:.88rem;">Hédi Gharbi</div>
+                                            <small class="text-muted" style="font-size:.7rem;">Sfax, Médina</small>
+                                        </td>
+                                        <td><code style="font-size:.8rem;color:#1a2e4a;">99887766</code></td>
+                                        <td>
+                                            <div style="font-size:.78rem;">
+                                                <span class="badge" style="background:#fdf0f0;color:#c0392b;margin-bottom:2px;">
+                                                    <i class="fas fa-gavel mr-1"></i>Amende
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-especes px-2 py-1">
+                                                <i class="fas fa-money-bill-wave mr-1"></i>Espèces
+                                            </span>
+                                        </td>
+                                        <td class="text-right"><strong style="color:#1a2e4a;font-size:.95rem;">270.000 DT</strong></td>
+                                        <td class="text-center"><a href="#" class="badge-recu"><i class="fas fa-file-pdf mr-1"></i>PDF</a></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background:#f8f9fc;font-weight:800;">
+                                        <td colspan="6" class="text-right" style="color:#1a2e4a;">
+                                            <i class="fas fa-sigma mr-1"></i>TOTAL SESSION
+                                        </td>
+                                        <td class="text-right" style="color:#1a2e4a;font-size:1rem;">1 245.500 DT</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /container-fluid -->
+        </div>
+    </div><!-- /content-wrapper -->
+</div><!-- /wrapper -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+/* Donut Chart */
+const canvas = document.getElementById('donutChart');
+if (canvas) {
+    new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: ['Espèces', 'Chèques'],
+            datasets: [{
+                data: [70, 30],
+                backgroundColor: ['#1cc88a', '#6610f2'],
+                borderColor: ['#17a673', '#4c0cb4'],
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            cutout: '68%',
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ' : ' + ctx.parsed.toFixed(1) + '%' } }
+            },
+            animation: { animateRotate: true, duration: 800 }
+        }
+    });
+}
+
+/* Hour Bars */
+const hourData = {'08h':1,'09h':1,'10h':1,'11h':1,'12h':0,'13h':1,'14h':0,'15h':0,'16h':0,'17h':0};
+const maxH = Math.max(...Object.values(hourData), 1);
+const barsEl = document.getElementById('hourBars');
+Object.entries(hourData).forEach(([h, c]) => {
+    const itemH = document.createElement('div');
+    itemH.className = 'hour-bar-item';
+    itemH.innerHTML = `
+        <div class="hour-bar-count">${c > 0 ? c : ''}</div>
+        <div class="hour-bar" style="height:${c > 0 ? Math.max(c / maxH * 70, 6) : 4}px;"></div>
+        <div class="hour-bar-label">${h}</div>
+    `;
+    barsEl.appendChild(itemH);
+});
+
+/* Filters */
+function applyFilter() {
+    const q = (document.getElementById('filterSearch').value || '').toLowerCase();
+    const mode = (document.getElementById('filterMode').value || '').toLowerCase();
+    const rows = document.querySelectorAll('#journalBody tr[data-mode]');
+    let total = 0;
+    rows.forEach(row => {
+        const show = (!q || row.dataset.search.toLowerCase().includes(q)) &&
+                     (!mode || row.dataset.mode === mode);
+        row.style.display = show ? '' : 'none';
+        if (show) {
+            const val = parseFloat(row.querySelector('td:nth-child(7) strong')?.textContent.replace(/[^\d.]/g,'')) || 0;
+            total += val;
+        }
+    });
+    document.getElementById('filteredTotal').textContent = total.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g,' ') + ' DT';
+}
+function resetFilters() {
+    document.getElementById('filterSearch').value = '';
+    document.getElementById('filterMode').value = '';
+    applyFilter();
+}
+</script>
+</body>
+</html>

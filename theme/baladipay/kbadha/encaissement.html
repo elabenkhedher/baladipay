@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encaissement — Kbadha</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --kbadha-navy:  #1a2e4a;
+            --kbadha-light: #1e3d6b;
+            --kbadha-gold:  #f6c23e;
+        }
+
+        /* ══ CIN Search zone ══ */
+        .cin-search-wrapper {
+            background: linear-gradient(135deg, var(--kbadha-navy), var(--kbadha-light));
+            border-radius: 14px;
+            padding: 2rem 2rem 1.5rem;
+            margin-bottom: 1.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .cin-search-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.04);
+        }
+        .cin-search-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -30px;
+            width: 130px; height: 130px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.03);
+        }
+        .cin-search-wrapper label {
+            color: rgba(255,255,255,.85);
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: .6rem;
+            display: block;
+        }
+        .cin-input {
+            height: 56px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,.25);
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            border-radius: 10px;
+            transition: border-color .2s, background .2s;
+        }
+        .cin-input::placeholder { color: rgba(255,255,255,.35); letter-spacing: 2px; font-size: 1rem; }
+        .cin-input:focus {
+            background: rgba(255,255,255,.18);
+            border-color: var(--kbadha-gold);
+            box-shadow: 0 0 0 3px rgba(246,194,62,.2);
+            color: #fff;
+            outline: none;
+        }
+        .btn-search-cin {
+            height: 56px;
+            background: var(--kbadha-gold);
+            border: none;
+            color: var(--kbadha-navy);
+            font-weight: 800;
+            font-size: 1rem;
+            border-radius: 10px;
+            padding: 0 1.75rem;
+            transition: transform .15s, opacity .2s;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .btn-search-cin:hover { opacity: .9; transform: translateY(-1px); }
+
+        /* ══ Citoyen found card ══ */
+        .citoyen-fiche {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            overflow: hidden;
+            display: none;
+        }
+        .citoyen-fiche.visible { display: block; }
+        .citoyen-fiche-header {
+            background: linear-gradient(135deg, #155724, #1e7e34);
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+        .citoyen-avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: #fff;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,.35);
+        }
+
+        /* Citoyen not found */
+        .citoyen-not-found {
+            display: none;
+            border: 2px dashed #f6c23e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            background: #fffdf0;
+        }
+        .citoyen-not-found.visible { display: block; }
+
+        /* ══ Tax / Amende checkboxes ══ */
+        .item-checkbox-card {
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            padding: .85rem 1rem;
+            margin-bottom: .65rem;
+            cursor: pointer;
+            transition: border-color .18s, background .18s, box-shadow .18s;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            background: #fff;
+        }
+        .item-checkbox-card:hover {
+            border-color: var(--kbadha-navy);
+            background: #f0f4f8;
+        }
+        .item-checkbox-card.checked {
+            border-color: #1cc88a;
+            background: #f0fff8;
+            box-shadow: 0 2px 10px rgba(28,200,138,.12);
+        }
+        .item-checkbox-card.amende.checked {
+            border-color: #e74c3c;
+            background: #fff5f5;
+            box-shadow: 0 2px 10px rgba(231,76,60,.1);
+        }
+        .item-check-box {
+            width: 22px; height: 22px;
+            border-radius: 5px;
+            border: 2px solid #cbd5e0;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            background: #fff;
+            transition: all .18s;
+        }
+        .item-checkbox-card.checked .item-check-box {
+            background: #1cc88a; border-color: #1cc88a; color: #fff;
+        }
+        .item-checkbox-card.amende.checked .item-check-box {
+            background: #e74c3c; border-color: #e74c3c;
+        }
+        .item-label { flex: 1; }
+        .item-label .item-name { font-weight: 700; font-size: .88rem; color: #2d3748; }
+        .item-label .item-meta { font-size: .72rem; color: #718096; }
+        .item-amount { font-weight: 800; font-size: .95rem; }
+        .item-checkbox-card.checked .item-amount { color: #1cc88a; }
+        .item-checkbox-card.amende.checked .item-amount { color: #e74c3c; }
+
+        /* ══ Mode paiement ══ */
+        .mode-card {
+            border: 2px solid #e3e6f0;
+            border-radius: 10px;
+            padding: 1.1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .18s, background .18s;
+        }
+        .mode-card:hover { border-color: var(--kbadha-navy); background: #f0f4f8; }
+        .mode-card.selected {
+            border-color: var(--kbadha-navy);
+            background: #eef4ff;
+        }
+        .mode-card .mode-icon {
+            font-size: 1.6rem;
+            margin-bottom: .4rem;
+            color: #a0aec0;
+            transition: color .18s;
+        }
+        .mode-card.selected .mode-icon { color: var(--kbadha-navy); }
+        .mode-card .mode-label {
+            font-weight: 700; font-size: .82rem;
+            color: #4a5568; text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .mode-radio { display: none; }
+
+        /* ══ Total block ══ */
+        .total-block {
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--kbadha-navy), var(--kbadha-light));
+            padding: 1.5rem;
+            color: #fff;
+            position: sticky;
+            top: 90px;
+        }
+        .total-label { font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; opacity: .75; }
+        .total-amount {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--kbadha-gold);
+            line-height: 1.1;
+        }
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .45rem 0;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+            font-size: .82rem;
+        }
+        .total-line:last-of-type { border-bottom: none; }
+        .total-line .tl-name { opacity: .8; }
+        .total-line .tl-val  { font-weight: 700; }
+
+        .btn-confirm {
+            background: var(--kbadha-gold);
+            border: none;
+            color: var(--kbadha-navy);
+            font-weight: 800;
+            font-size: 1rem;
+            height: 52px;
+            border-radius: 10px;
+            width: 100%;
+            transition: transform .15s, opacity .2s;
+            cursor: pointer;
+        }
+        .btn-confirm:hover { transform: translateY(-2px); opacity: .92; }
+        .btn-confirm:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+        /* ══ Section titles ══ */
+        .section-title-bar {
+            display: flex; align-items: center; gap: .5rem;
+            font-size: .72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .8px;
+            color: var(--kbadha-navy);
+            margin-bottom: .85rem;
+            padding-bottom: .5rem;
+            border-bottom: 2px solid #e3e6f0;
+        }
+        .section-title-bar .stb-icon {
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            background: var(--kbadha-navy);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .65rem;
+        }
+
+        #searchSpinner { display: none; }
+
+        .recu-toast {
+            position: fixed; bottom: 90px; right: 24px;
+            background: #1cc88a; color: #fff;
+            padding: .75rem 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(28,200,138,.4);
+            font-weight: 700; font-size: .85rem;
+            display: none;
+            z-index: 9998;
+        }
+    </style>
+</head>
+<body id="page-top">
+
+<div id="wrapper">
+
+    <!-- templates/kbadha/_sidebar.html -->
+<ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebarKbadha"
+    style="background: linear-gradient(180deg, #1a2e4a 10%, #1e3d6b 100%); background-color: #1a2e4a;">
+
+    <!-- Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="encaissement.html">
+        <div class="sidebar-brand-icon">
+            <i class="fas fa-cash-register fa-lg"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3" style="line-height:1.2;">
+            Kbadha
+            <span style="display:block;font-size:.62rem;font-weight:400;opacity:.65;letter-spacing:1.5px;text-transform:uppercase;">
+                Guichet BaladiPay
+            </span>
+        </div>
+    </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <!-- Encaissement -->
+    <li class="nav-item">
+        <a class="nav-link" href="encaissement.html">
+            <i class="fas fa-fw fa-hand-holding-usd"></i>
+            <span>Encaissement</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Session</div>
+
+    <!-- Journal -->
+    <li class="nav-item active">
+        <a class="nav-link" href="journal.html">
+            <i class="fas fa-fw fa-book-open"></i>
+            <span>Journal du jour</span>
+            <span class="badge badge-success ml-auto">5</span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Actions</div>
+
+    <!-- Nouveau citoyen minimal -->
+    <li class="nav-item">
+        <a class="nav-link" href="citoyen_new.html" data-toggle="modal" data-target="#modalCitoyenMinimal">
+            <i class="fas fa-fw fa-user-plus"></i>
+            <span>Citoyen sans compte</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+</ul>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <span class="font-weight-bold text-gray-800">
+                    <i class="fas fa-hand-holding-usd mr-2 text-primary"></i>Encaissement
+                </span>
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item mr-3">
+                        <div class="d-flex align-items-center" style="gap:.4rem;">
+                            <div style="text-align:right;">
+                                <div style="font-size:.65rem;color:#858796;text-transform:uppercase;letter-spacing:.5px;">Session</div>
+                                <div style="font-size:.82rem;font-weight:700;color:#1a2e4a;">
+                                    <i class="fas fa-users mr-1"></i>5 servis
+                                    &nbsp;|&nbsp;
+                                    <i class="fas fa-coins mr-1"></i>1 245.500 DT
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <div class="topbar-divider d-none d-sm-block"></div>
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                Mohamed Ben Salah
+                                <br><small style="font-size:.62rem;color:#a0aec0;">Agent Guichet</small>
+                            </span>
+                            <div style="width:36px;height:36px;background:linear-gradient(135deg,#1a2e4a,#1e3d6b);display:inline-flex;align-items:center;justify-content:center;border-radius:50%;">
+                                <i class="fas fa-user text-white" style="font-size:.85rem;"></i>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow">
+                            <div class="dropdown-item-text">
+                                <div class="font-weight-bold">Mohamed Ben Salah</div>
+                                <small class="text-muted">CIN: 12300099</small>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="journal.html">
+                                <i class="fas fa-book-open fa-sm mr-2 text-primary"></i>Journal du jour
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="#">
+                                <i class="fas fa-sign-out-alt fa-sm mr-2 text-danger"></i>Déconnexion
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main content -->
+            <div class="container-fluid">
+
+                <!-- Flash success (demo) -->
+                <div class="alert alert-success alert-dismissible fade show shadow-sm mb-3" id="flashSuccess" style="display:none!important;">
+                    <i class="fas fa-check-circle mr-2"></i><strong>Paiement enregistré !</strong> Le reçu a été généré.
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+
+                <!-- CIN Search -->
+                <div class="cin-search-wrapper" style="position:relative;z-index:1;">
+                    <label>
+                        <i class="fas fa-search mr-1"></i>Recherche citoyen par CIN
+                    </label>
+                    <div class="d-flex" style="gap:.75rem;">
+                        <input type="text"
+                               class="form-control cin-input flex-grow-1"
+                               id="cinSearchInput"
+                               value=""
+                               placeholder="00000000"
+                               maxlength="8"
+                               pattern="\d{8}"
+                               autocomplete="off"
+                               autofocus>
+                        <button type="button" class="btn-search-cin" id="btnSearch" onclick="searchCitoyen()">
+                            <span id="searchSpinner" class="spinner-border spinner-border-sm mr-1" role="status"></span>
+                            <i class="fas fa-search mr-1" id="searchIcon"></i>Rechercher
+                        </button>
+                    </div>
+                    <div class="mt-2" style="font-size:.72rem;color:rgba(255,255,255,.55);">
+                        <i class="fas fa-keyboard mr-1"></i>Entrez 8 chiffres et appuyez sur Entrée ou cliquez Rechercher
+                        <span style="margin-left:1rem;opacity:.8;">Demo: essayez <strong style="color:var(--kbadha-gold);">12345678</strong> ou <strong style="color:var(--kbadha-gold);">99999999</strong></span>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="row">
+
+                    <!-- LEFT -->
+                    <div class="col-xl-7 col-lg-7">
+
+                        <!-- Citoyen trouvé -->
+                        <div class="citoyen-fiche mb-4" id="ficheCitoyen">
+                            <div class="citoyen-fiche-header" id="ficheHeader"></div>
+                            <div class="card-body p-0" id="ficheBody"></div>
+                        </div>
+
+                        <!-- Citoyen non trouvé -->
+                        <div class="citoyen-not-found" id="ficheNotFound">
+                            <div class="mb-3">
+                                <i class="fas fa-user-times fa-2x" style="color:#f6c23e;"></i>
+                            </div>
+                            <h5 class="font-weight-bold text-gray-800">Aucun compte trouvé</h5>
+                            <p class="text-muted mb-3">
+                                CIN <strong id="notFoundCin"></strong> n'est pas enregistré dans le système.
+                            </p>
+                            <button type="button" class="btn btn-warning font-weight-bold"
+                                    data-toggle="modal" data-target="#modalCitoyenMinimal">
+                                <i class="fas fa-user-plus mr-2"></i>Créer un profil minimal &amp; Payer
+                            </button>
+                            <p class="text-muted mt-2 mb-0" style="font-size:.75rem;">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Un reçu PDF sera généré comme seule trace de paiement.
+                            </p>
+                        </div>
+
+                        <!-- État initial -->
+                        <div class="text-center py-5 text-muted" id="stateInitial">
+                            <i class="fas fa-search fa-3x mb-3" style="opacity:.2;"></i>
+                            <p class="font-weight-bold mb-1">Recherchez un citoyen par son CIN</p>
+                            <small>Saisissez les 8 chiffres du CIN dans la barre de recherche ci-dessus</small>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT — Total & Confirmation -->
+                    <div class="col-xl-5 col-lg-5">
+                        <div class="total-block" id="totalBlock">
+                            <div class="total-label mb-1">Récapitulatif</div>
+                            <div class="total-amount" id="totalDisplay">0,000 DT</div>
+                            <hr style="border-color:rgba(255,255,255,.15);margin:1rem 0;">
+                            <div id="totalLines">
+                                <div class="total-line" style="opacity:.6;font-size:.78rem;font-style:italic;">
+                                    <span>Aucun élément sélectionné</span>
+                                </div>
+                            </div>
+                            <hr style="border-color:rgba(255,255,255,.15);margin:1rem 0;">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="total-label">Mode</div>
+                                <div style="font-weight:700;font-size:.85rem;" id="modeDisplay">
+                                    <i class="fas fa-money-bill-wave mr-1" style="color:var(--kbadha-gold);"></i>Espèces
+                                </div>
+                            </div>
+                            <button type="button" class="btn-confirm" id="btnConfirm" disabled
+                                    onclick="confirmerPaiement()">
+                                <i class="fas fa-check-circle mr-2"></i>Confirmer le Paiement
+                            </button>
+                            <div class="text-center mt-3" style="font-size:.7rem;opacity:.6;">
+                                <i class="fas fa-file-pdf mr-1"></i>Un reçu PDF sera généré automatiquement
+                            </div>
+                            <div class="text-center mt-3" id="searchHint" style="font-size:.75rem;opacity:.65;">
+                                <i class="fas fa-arrow-left mr-1"></i>Recherchez d'abord un citoyen
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL — Citoyen sans compte -->
+<div class="modal fade" id="modalCitoyenMinimal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header" style="background:#1a2e4a;">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-user-plus mr-2"></i>Citoyen sans compte — Profil minimal
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning py-2 mb-3">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Un <strong>reçu PDF</strong> sera généré comme seule preuve de paiement.
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold small text-uppercase" style="color:#1a2e4a;">
+                        CIN <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="cinMinimal"
+                           placeholder="12345678" maxlength="8" pattern="\d{8}">
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label class="font-weight-bold small text-uppercase" style="color:#1a2e4a;">
+                                Prénom <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="Mohamed">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label class="font-weight-bold small text-uppercase" style="color:#1a2e4a;">
+                                Nom <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="Ben Ali">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold small text-uppercase" style="color:#1a2e4a;">
+                        Montant à payer (DT) <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" placeholder="0.000" min="0" step="0.001">
+                        <div class="input-group-append">
+                            <span class="input-group-text font-weight-bold">DT</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold small text-uppercase" style="color:#1a2e4a;">
+                        Motif du paiement
+                    </label>
+                    <input type="text" class="form-control" placeholder="Ex: Taxe foncière 2025">
+                </div>
+                <div class="form-group">
+                    <label class="font-weight-bold small text-uppercase" style="color:#1a2e4a;">Mode de paiement</label>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mode-card selected" id="minModeEsp" onclick="selectModeMinimal('especes')">
+                                <div class="mode-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                <div class="mode-label">Espèces</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mode-card" id="minModeCheq" onclick="selectModeMinimal('cheque')">
+                                <div class="mode-icon"><i class="fas fa-money-check"></i></div>
+                                <div class="mode-label">Chèque</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer px-0 pb-0">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn font-weight-bold" style="background:#1a2e4a;color:#fff;"
+                            onclick="showToast()">
+                        <i class="fas fa-file-pdf mr-2"></i>Encaisser &amp; Générer Reçu PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast reçu -->
+<div class="recu-toast" id="recuToast">
+    <i class="fas fa-file-pdf mr-2"></i>Reçu PDF généré avec succès !
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── Demo data ── */
+const DEMO_CITOYENS = {
+    '12345678': {
+        prenom: 'Ali', nom: 'Ben Mrad', cin: '12345678',
+        telephone: '22 345 678', adresse: 'Tunis, Bab El Bhar',
+        taxes: [
+            { id: 1, nom: 'Taxe foncière 2025', montant: 320.000, annee: 2025 },
+            { id: 2, nom: "Taxe d'habitation 2024", montant: 150.000, annee: 2024 }
+        ],
+        amendes: [
+            { id: 1, typeInfraction: 'Stationnement interdit', montant: 50.000, lieu: 'Avenue Bourguiba' }
+        ]
+    },
+    '87654321': {
+        prenom: 'Fatma', nom: 'Chaari', cin: '87654321',
+        telephone: '98 765 432', adresse: 'Ariana, Ghazala',
+        taxes: [
+            { id: 3, nom: 'Taxe foncière 2025', montant: 220.000, annee: 2025 }
+        ],
+        amendes: []
+    }
+};
+
+let currentMode = 'especes';
+
+function searchCitoyen() {
+    const cin = document.getElementById('cinSearchInput').value.replace(/\D/g,'').slice(0,8);
+    if (!cin) return;
+    document.getElementById('searchSpinner').style.display = 'inline-block';
+    document.getElementById('searchIcon').style.display = 'none';
+
+    setTimeout(() => {
+        document.getElementById('searchSpinner').style.display = 'none';
+        document.getElementById('searchIcon').style.display = 'inline-block';
+        const citoyen = DEMO_CITOYENS[cin];
+        document.getElementById('stateInitial').style.display = 'none';
+        document.getElementById('ficheNotFound').classList.remove('visible');
+        document.getElementById('ficheCitoyen').classList.remove('visible');
+
+        if (citoyen) {
+            renderCitoyen(citoyen);
+        } else {
+            document.getElementById('notFoundCin').textContent = cin;
+            document.getElementById('ficheNotFound').classList.add('visible');
+        }
+        updateTotal();
+    }, 600);
+}
+
+function renderCitoyen(c) {
+    document.getElementById('ficheHeader').innerHTML = `
+        <div class="citoyen-avatar"><i class="fas fa-user"></i></div>
+        <div style="flex:1;">
+            <div class="text-white font-weight-bold" style="font-size:1.05rem;">${c.prenom} ${c.nom}</div>
+            <div style="font-size:.75rem;color:rgba(255,255,255,.7);">
+                CIN&nbsp;:&nbsp;<strong class="text-white">${c.cin}</strong>
+                &nbsp;·&nbsp;<i class="fas fa-phone mr-1"></i>${c.telephone}
+                &nbsp;·&nbsp;<i class="fas fa-map-marker-alt mr-1"></i>${c.adresse}
+            </div>
+        </div>
+        <div><span class="badge badge-success px-3 py-2" style="font-size:.72rem;"><i class="fas fa-check-circle mr-1"></i>Identifié</span></div>
+    `;
+
+    let taxesHtml = '';
+    if (c.taxes.length > 0) {
+        taxesHtml += `<div style="padding:1.25rem 1.25rem .75rem;">
+            <div class="section-title-bar">
+                <div class="stb-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                Taxes municipales dues
+                <span class="badge badge-primary ml-auto">${c.taxes.length}</span>
+            </div>`;
+        c.taxes.forEach(t => {
+            taxesHtml += `
+            <div class="item-checkbox-card taxe-item" data-amount="${t.montant}" onclick="toggleItem(this)">
+                <div class="item-check-box"><i class="fas fa-check" style="font-size:.65rem;display:none;"></i></div>
+                <div class="item-label">
+                    <div class="item-name"><i class="fas fa-file-invoice text-primary mr-1"></i>${t.nom}</div>
+                    <div class="item-meta">Exercice ${t.annee}</div>
+                </div>
+                <div class="item-amount text-primary">${t.montant.toFixed(3)} DT</div>
+            </div>`;
+        });
+        taxesHtml += '</div>';
+    }
+
+    let amendesHtml = '';
+    if (c.amendes.length > 0) {
+        amendesHtml = `<div style="padding:0 1.25rem .75rem;">
+            <div class="section-title-bar mt-3">
+                <div class="stb-icon" style="background:#e74c3c;"><i class="fas fa-gavel"></i></div>
+                Amendes impayées
+                <span class="badge badge-danger ml-auto">${c.amendes.length}</span>
+            </div>`;
+        c.amendes.forEach(a => {
+            amendesHtml += `
+            <div class="item-checkbox-card amende taxe-item" data-amount="${a.montant}" onclick="toggleItem(this)">
+                <div class="item-check-box"><i class="fas fa-check" style="font-size:.65rem;display:none;"></i></div>
+                <div class="item-label">
+                    <div class="item-name"><i class="fas fa-exclamation-triangle text-danger mr-1"></i>${a.typeInfraction}</div>
+                    <div class="item-meta">${a.lieu}</div>
+                </div>
+                <div class="item-amount text-danger">${a.montant.toFixed(3)} DT</div>
+            </div>`;
+        });
+        amendesHtml += '</div>';
+    }
+
+    document.getElementById('ficheBody').innerHTML = taxesHtml + amendesHtml + `
+        <div style="padding:0 1.25rem 1.25rem;">
+            <div class="mt-3">
+                <div class="section-title-bar">
+                    <div class="stb-icon"><i class="fas fa-wallet"></i></div>Mode de paiement
+                </div>
+                <div class="row" style="gap:0;">
+                    <div class="col-6 pr-2">
+                        <div class="mode-card selected" id="modeEspeces" onclick="selectMode('especes')">
+                            <div class="mode-icon"><i class="fas fa-money-bill-wave"></i></div>
+                            <div class="mode-label">Espèces</div>
+                        </div>
+                    </div>
+                    <div class="col-6 pl-2">
+                        <div class="mode-card" id="modeCheque" onclick="selectMode('cheque')">
+                            <div class="mode-icon"><i class="fas fa-money-check"></i></div>
+                            <div class="mode-label">Chèque</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="chequeNumWrap" class="mt-3" style="display:none;">
+                    <label style="font-size:.72rem;font-weight:700;text-transform:uppercase;color:#1a2e4a;">
+                        <i class="fas fa-hashtag mr-1"></i>Numéro de chèque
+                    </label>
+                    <input type="text" class="form-control" placeholder="Ex: 0012345">
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('ficheCitoyen').classList.add('visible');
+    document.getElementById('searchHint').style.display = 'none';
+    currentMode = 'especes';
+    updateTotal();
+}
+
+function toggleItem(card) {
+    card.classList.toggle('checked');
+    const icon = card.querySelector('.item-check-box i');
+    if (icon) icon.style.display = card.classList.contains('checked') ? 'block' : 'none';
+    updateTotal();
+}
+
+function updateTotal() {
+    const cards = document.querySelectorAll('.item-checkbox-card.checked');
+    let total = 0;
+    const lines = [];
+    cards.forEach(c => {
+        const amt = parseFloat(c.dataset.amount) || 0;
+        const name = c.querySelector('.item-name')?.textContent.trim() || '—';
+        total += amt;
+        lines.push({ name, amt });
+    });
+
+    const fmt = total.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    document.getElementById('totalDisplay').textContent = fmt + ' DT';
+
+    const container = document.getElementById('totalLines');
+    if (lines.length === 0) {
+        container.innerHTML = '<div class="total-line" style="opacity:.6;font-size:.78rem;font-style:italic;"><span>Aucun élément sélectionné</span></div>';
+    } else {
+        container.innerHTML = lines.map(l =>
+            `<div class="total-line"><span class="tl-name">${l.name}</span><span class="tl-val">${l.amt.toFixed(3)} DT</span></div>`
+        ).join('') + `<div class="total-line" style="font-size:.9rem;"><strong>Total</strong><strong style="color:var(--kbadha-gold);">${total.toFixed(3)} DT</strong></div>`;
+    }
+
+    const btn = document.getElementById('btnConfirm');
+    if (btn) btn.disabled = total === 0;
+}
+
+function selectMode(mode) {
+    currentMode = mode;
+    const espEl = document.getElementById('modeEspeces');
+    const chqEl = document.getElementById('modeCheque');
+    if (espEl) espEl.classList.toggle('selected', mode === 'especes');
+    if (chqEl) chqEl.classList.toggle('selected', mode === 'cheque');
+    const wrap = document.getElementById('chequeNumWrap');
+    if (wrap) wrap.style.display = mode === 'cheque' ? 'block' : 'none';
+    const modeDisplay = document.getElementById('modeDisplay');
+    if (modeDisplay) {
+        modeDisplay.innerHTML = mode === 'especes'
+            ? '<i class="fas fa-money-bill-wave mr-1" style="color:var(--kbadha-gold);"></i>Espèces'
+            : '<i class="fas fa-money-check mr-1" style="color:var(--kbadha-gold);"></i>Chèque';
+    }
+}
+
+function selectModeMinimal(mode) {
+    document.getElementById('minModeEsp').classList.toggle('selected', mode === 'especes');
+    document.getElementById('minModeCheq').classList.toggle('selected', mode === 'cheque');
+}
+
+function confirmerPaiement() {
+    showToast();
+}
+
+function showToast() {
+    const toast = document.getElementById('recuToast');
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    $('#modalCitoyenMinimal').modal('hide');
+}
+
+/* Auto-submit on 8 digits */
+document.getElementById('cinSearchInput').addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 8);
+    if (this.value.length === 8) searchCitoyen();
+});
+document.getElementById('cinSearchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') searchCitoyen();
+});
+</script>
+</body>
+</html>

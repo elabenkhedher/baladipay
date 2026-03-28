@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BaladiPay – Ajouter Citoyen</title>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        .bg-gradient-baladipay { background: linear-gradient(180deg,#1a2e4a 10%,#0d1b2e 100%) !important; }
+        .bg-gradient-police { background: linear-gradient(180deg,#2c3e50 10%,#1a252f 100%) !important; }
+        .bg-gradient-citizen { background: linear-gradient(180deg,#006233 10%,#003d20 100%) !important; }
+        .baladipay-badge { background:#e63946;color:#fff;font-size:.6rem;padding:2px 7px;border-radius:10px;margin-left:5px;vertical-align:middle; }
+        .reclamation-card { border-left: 4px solid #f6c23e; transition: box-shadow .2s; }
+        .reclamation-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important; }
+        .reclamation-card.resolue { border-left-color: #1cc88a; }
+        .reclamation-card.rejetee { border-left-color: #e74a3b; }
+        .step-badge { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: #fff; flex-shrink: 0; }
+        .citoyen-found { border: 2px solid #1cc88a; background: #f0fff4; border-radius: 8px; }
+    </style>
+</head>
+
+<body id="page-top">
+<div id="wrapper">
+    
+    <ul class="navbar-nav bg-gradient-baladipay sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.html">
+            <div class="sidebar-brand-icon"><i class="fas fa-landmark"></i></div>
+            <div class="sidebar-brand-text mx-3">BaladiPay</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item ">
+            <a class="nav-link" href="dashboard.html"><i class="fas fa-fw fa-tachometer-alt"></i><span>Tableau de Bord</span></a>
+        </li>
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Gestion</div>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCitoyens">
+                <i class="fas fa-fw fa-users"></i><span>Gestion des Citoyens</span>
+            </a>
+            <div id="collapseCitoyens" class="collapse" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Citoyens :</h6>
+                    <a class="collapse-item" href="citoyen_new.html">Ajouter des Citoyens</a>
+                    <a class="collapse-item" href="citoyens.html">Liste des Citoyens</a>
+                </div>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePolice">
+                <i class="fas fa-fw fa-shield-alt"></i><span>Gestion Police</span>
+            </a>
+            <div id="collapsePolice" class="collapse" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Agents :</h6>
+                    <a class="collapse-item" href="agent_new.html">Ajouter des Agents</a>
+                    <a class="collapse-item" href="agents.html">Liste des Agents</a>
+                </div>
+            </div>
+        </li>
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Taxe</div>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePaiements">
+                <i class="fas fa-fw fa-folder"></i><span>Paiements</span>
+            </a>
+            <div id="collapsePaiements" class="collapse" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Taxes :</h6>
+                    <a class="collapse-item" href="paiements.html">Paiements</a>
+                    <a class="collapse-item" href="taxes.html">Impôts</a>
+                </div>
+            </div>
+        </li>
+        <li class="nav-item ">
+            <a class="nav-link" href="reclamations.html"><i class="fas fa-fw fa-envelope-open-text"></i><span>Réclamations</span><span class="baladipay-badge">3</span></a>
+        </li>
+        <li class="nav-item ">
+            <a class="nav-link" href="infractions.html"><i class="fas fa-fw fa-exclamation-triangle"></i><span>Infractions</span><span class="baladipay-badge">5</span></a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline"><button class="rounded-circle border-0" id="sidebarToggle"></button></div>
+    </ul>
+    <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+    
+    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"><i class="fa fa-bars"></i></button>
+        <div class="d-none d-sm-flex align-items-center ml-3">
+            <i class="fas fa-landmark text-secondary mr-2"></i>
+            <span class="text-gray-600 small font-weight-bold">Municipalité de Tunis</span>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            <div class="topbar-divider d-none d-sm-block"></div>
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin BaladiPay</span>
+                    <span class="badge badge-dark" style="font-size:.6rem;">ADMIN</span>
+                    <img class="img-profile rounded-circle ml-1" src="https://ui-avatars.com/api/?name=Admin&background=1a2e4a&color=fff&size=32">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                    <a class="dropdown-item" href="#"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>Profil</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Déconnexion
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+<div class="container-fluid">
+
+    <h1 class="h3 mb-4 text-gray-800">
+        <i class="fas fa-user mr-2 text-success"></i>
+        Ajouter un Citoyen
+    </h1>
+
+    <div class="row">
+
+        <!-- FORM -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+
+                <div class="card-header py-3 bg-success">
+                    <h6 class="m-0 font-weight-bold text-white">
+                        Informations Citoyen
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <form>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>CIN</label>
+                                <input type="text" class="form-control" placeholder="12345678">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Téléphone</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Prénom</label>
+                                <input type="text" class="form-control">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Nom</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date de naissance</label>
+                            <input type="date" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Genre</label>
+                            <select class="form-control">
+                                <option>Masculin</option>
+                                <option>Féminin</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Adresse</label>
+                            <textarea class="form-control"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Ville</label>
+                                <input type="text" class="form-control">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Code Postal</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Mot de passe</label>
+                                <input type="password" class="form-control">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Confirmer</label>
+                                <input type="password" class="form-control">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success">
+                            <i class="fas fa-save mr-1"></i>
+                            Enregistrer
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDE -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    Aperçu
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-user fa-3x text-gray-400 mb-3"></i>
+                    <p class="text-muted">Informations citoyen</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</div>
+
+<footer class="sticky-footer bg-white text-center py-3">
+    © 2026 BaladiPay
+</footer>
+
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/js/sb-admin-2.min.js"></script>
+
+</body>
+</html>

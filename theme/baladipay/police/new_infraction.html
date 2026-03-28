@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>BaladiPay – Police / Nouvelle Infraction</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700,800,900" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        .bg-gradient-baladipay { background: linear-gradient(180deg,#1a2e4a 10%,#0d1b2e 100%) !important; }
+        .bg-gradient-police { background: linear-gradient(180deg,#2c3e50 10%,#1a252f 100%) !important; }
+        .bg-gradient-citizen { background: linear-gradient(180deg,#006233 10%,#003d20 100%) !important; }
+        .baladipay-badge { background:#e63946;color:#fff;font-size:.6rem;padding:2px 7px;border-radius:10px;margin-left:5px;vertical-align:middle; }
+        .reclamation-card { border-left: 4px solid #f6c23e; transition: box-shadow .2s; }
+        .reclamation-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important; }
+        .reclamation-card.resolue { border-left-color: #1cc88a; }
+        .reclamation-card.rejetee { border-left-color: #e74a3b; }
+        .step-badge { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; color: #fff; flex-shrink: 0; }
+        .citoyen-found { border: 2px solid #1cc88a; background: #f0fff4; border-radius: 8px; }
+    </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+    
+    <ul class="navbar-nav bg-gradient-police sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.html">
+            <div class="sidebar-brand-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="sidebar-brand-text mx-3">Police – BP</div>
+        </a>
+        <hr class="sidebar-divider my-0">
+        <li class="nav-item active">
+            <a class="nav-link" href="new_infraction.html"><i class="fas fa-fw fa-plus-circle"></i><span>Nouvelle Infraction</span></a>
+        </li>
+        <li class="nav-item ">
+            <a class="nav-link" href="journal.html"><i class="fas fa-fw fa-list-alt"></i><span>Mon Journal</span></a>
+        </li>
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+            <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal"><i class="fas fa-fw fa-sign-out-alt"></i><span>Déconnexion</span></a>
+        </li>
+        <hr class="sidebar-divider d-none d-md-block">
+        <div class="text-center d-none d-md-inline"><button class="rounded-circle border-0" id="sidebarToggle"></button></div>
+    </ul>
+    <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+    
+    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"><i class="fa fa-bars"></i></button>
+        <div class="d-none d-sm-flex align-items-center ml-3">
+            <i class="fas fa-shield-alt text-secondary mr-2"></i>
+            <span class="text-gray-600 small font-weight-bold">Interface Agent Police</span>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            <div class="topbar-divider d-none d-sm-block"></div>
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">Agent Sami Khedira</span>
+                    <span class="badge" style="background:#2c3e50;color:#fff;font-size:.6rem;">POLICE</span>
+                    <img class="img-profile rounded-circle ml-1" src="https://ui-avatars.com/api/?name=Sami&background=2c3e50&color=fff&size=32">
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Déconnexion
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="container-fluid">
+    
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-plus-circle mr-2 text-danger"></i>Enregistrer une Infraction</h1>
+    <span class="badge badge-secondary px-3 py-2"><i class="fas fa-clock mr-1"></i>Mars 2026</span>
+</div>
+<!-- ÉTAPE 1 -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3" style="background:#2c3e50;">
+        <h6 class="m-0 font-weight-bold text-white">
+            <span class="step-badge mr-2" style="background:#e63946;">1</span>
+            Identifier le Contrevenant par CIN
+        </h6>
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="background:#2c3e50;border-color:#2c3e50;"><i class="fas fa-id-card text-white"></i></span>
+                </div>
+                <input type="text" class="form-control form-control-lg" pattern="[0-9]{8}" maxlength="8" placeholder="Saisir le CIN du contrevenant (8 chiffres)" value="12345678">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-lg" style="background:#2c3e50;color:#fff;border-color:#2c3e50;"><i class="fas fa-search mr-1"></i>Rechercher</button>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block"><i class="fas fa-info-circle mr-1"></i>Entrez le numéro CIN à 8 chiffres du contrevenant identifié sur le terrain.</small>
+        </form>
+        <!-- Citoyen trouvé -->
+        <div class="citoyen-found p-3 mt-4">
+            <div class="row align-items-center">
+                <div class="col-auto"><div class="icon-circle bg-success"><i class="fas fa-user-check text-white"></i></div></div>
+                <div class="col">
+                    <div class="font-weight-bold text-success mb-1"><i class="fas fa-check-circle mr-1"></i>Citoyen identifié</div>
+                    <div class="row text-sm">
+                        <div class="col-md-4"><strong>Nom :</strong> Mohamed Ben Ali</div>
+                        <div class="col-md-4"><strong>CIN :</strong> <code>12345678</code></div>
+                        <div class="col-md-4"><strong>Email :</strong> m.benali@email.tn</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ÉTAPE 2 -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3" style="background:#e74a3b;">
+        <h6 class="m-0 font-weight-bold text-white">
+            <span class="step-badge mr-2" style="background:rgba(0,0,0,0.2);">2</span>
+            Saisir les Détails de l'Infraction
+        </h6>
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label class="font-weight-bold small text-gray-600"><i class="fas fa-exclamation-triangle mr-1 text-danger"></i>Type d'Infraction *</label>
+                    <select class="form-control">
+                        <option>Radar vitesse</option>
+                        <option>Feu rouge grillé</option>
+                        <option>Stationnement illégal</option>
+                        <option>Autre</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="font-weight-bold small text-gray-600"><i class="fas fa-money-bill-wave mr-1 text-success"></i>Montant de l'Amende (DT) *</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" min="20" step="0.001" placeholder="80.000">
+                        <div class="input-group-append"><span class="input-group-text font-weight-bold">DT</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label class="font-weight-bold small text-gray-600"><i class="fas fa-map-marker-alt mr-1 text-primary"></i>Lieu exact de l'infraction *</label>
+                    <input type="text" class="form-control" placeholder="Ex: Av. Habib Bourguiba, angle Rue de Rome">
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="font-weight-bold small text-gray-600"><i class="fas fa-car mr-1 text-secondary"></i>Plaque d'Immatriculation *</label>
+                    <input type="text" class="form-control" placeholder="Ex: 456 TUN 789" style="font-family:monospace;font-weight:600;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="font-weight-bold small text-gray-600"><i class="fas fa-sticky-note mr-1 text-warning"></i>Notes / Observations (optionnel)</label>
+                <textarea class="form-control" rows="3" placeholder="Observations supplémentaires de l'agent..."></textarea>
+            </div>
+            <div class="border-top pt-3 mt-2">
+                <a href="journal.html" class="btn btn-danger btn-lg btn-block"><i class="fas fa-save mr-2"></i>Enregistrer l'Infraction</a>
+                <p class="text-center text-muted small mt-2"><i class="fas fa-bolt mr-1"></i>L'infraction sera visible immédiatement dans l'espace du citoyen.</p>
+            </div>
+        </form>
+    </div>
+</div>
+    </div>
+    </div>
+    <footer class="sticky-footer bg-white">
+        <div class="container my-auto"><div class="copyright text-center my-auto"><span>© 2026 <strong>Municipalité de Tunis</strong> – BaladiPay. Tous droits réservés.</span></div></div>
+    </footer>
+    </div>
+</div>
+
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document"><div class="modal-content">
+        <div class="modal-header" style="background:#1a2e4a;"><h5 class="modal-title text-white"><i class="fas fa-sign-out-alt mr-2"></i>Déconnexion</h5><button class="close text-white" type="button" data-dismiss="modal"><span>&times;</span></button></div>
+        <div class="modal-body">Êtes-vous sûr de vouloir terminer votre session ?</div>
+        <div class="modal-footer"><button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button><a class="btn btn-dark" href="../security/login.html">Déconnexion</a></div>
+    </div></div>
+</div>
+<a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/js/sb-admin-2.min.js"></script>
+</body>
+</html>

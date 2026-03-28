@@ -1,0 +1,55 @@
+<!-- templates/kbadha/_sidebar.html -->
+<ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebarKbadha"
+    style="background: linear-gradient(180deg, #1a2e4a 10%, #1e3d6b 100%); background-color: #1a2e4a;">
+
+    <!-- Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="encaissement.html">
+        <div class="sidebar-brand-icon">
+            <i class="fas fa-cash-register fa-lg"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3" style="line-height:1.2;">
+            Kbadha
+            <span style="display:block;font-size:.62rem;font-weight:400;opacity:.65;letter-spacing:1.5px;text-transform:uppercase;">
+                Guichet BaladiPay
+            </span>
+        </div>
+    </a>
+
+    <hr class="sidebar-divider my-0">
+
+    <!-- Encaissement -->
+    <li class="nav-item">
+        <a class="nav-link" href="encaissement.html">
+            <i class="fas fa-fw fa-hand-holding-usd"></i>
+            <span>Encaissement</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Session</div>
+
+    <!-- Journal -->
+    <li class="nav-item active">
+        <a class="nav-link" href="journal.html">
+            <i class="fas fa-fw fa-book-open"></i>
+            <span>Journal du jour</span>
+            <span class="badge badge-success ml-auto">5</span>
+        </a>
+    </li>
+    <hr class="sidebar-divider">
+    <div class="sidebar-heading">Actions</div>
+
+    <!-- Nouveau citoyen minimal -->
+    <li class="nav-item">
+        <a class="nav-link" href="citoyen_new.html" data-toggle="modal" data-target="#modalCitoyenMinimal">
+            <i class="fas fa-fw fa-user-plus"></i>
+            <span>Citoyen sans compte</span>
+        </a>
+    </li>
+
+    <hr class="sidebar-divider d-none d-md-block">
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+</ul>
